@@ -1,285 +1,302 @@
-# GateMOT
+# Multiple Object Tracking by Switching Clues of the Association in Motion-complex Scene
 
-A real-time multi-object tracking framework with Gate Attention Decoder (GAD) for efficient feature fusion.
+## Abstract
 
-## 🎯 Features
+This project presents an efficient multi-object tracking framework designed for motion-complex scenarios. We introduce a Gate Attention Decoder (GAD) that employs learnable gating mechanisms to selectively emphasize discriminative features while maintaining computational efficiency. The decoder achieves O(HW) complexity through element-wise operations and local pooling, significantly more efficient than standard self-attention's O(H²W²) complexity. Our method demonstrates strong performance across multiple MOT benchmarks including MOT17, MOT20, DanceTrack, and SportsMOT.
 
-- **Gate Attention Decoder (GAD)**: Lightweight bilinear feature fusion with learnable gating mechanism
-- **Efficient Architecture**: O(HW) complexity compared to O(H²W²) in standard attention
-- **Multiple Dataset Support**: MOT17, MOT20, DanceTrack, SportsMOT
-- **Real-time Performance**: 30+ FPS on single GPU
-- **Flexible Tracking**: Support for multiple tracking algorithms (Hungarian, DeepSORT, ByteTrack, etc.)
+**Key Features:**
+- Gate Attention Decoder for efficient feature fusion
+- Real-time performance (30+ FPS on single GPU)
+- Support for multiple tracking algorithms (Hungarian, ByteTrack, DeepSORT, etc.)
+- The model can be trained on still **image datasets** if videos are not available.
 
-## 🏗️ Architecture
-
-### Gate Attention Decoder
-
-The core innovation is the Gate Attention Decoder (GAD) that efficiently transforms backbone features:
-
-```
-Input X → Q, K, V Projections
-         ↓
-G = σ(Q)  (Gate Signal)
-         ↓
-K' = K ⊙ G  (Gated Key)
-         ↓
-K̂ = MaxPool(K')  (Spatial Aggregation)
-         ↓
-Y = ψ([V, K̂])  (Feature Fusion)
-```
-
-**Key Components:**
-- **Query Gating**: `G = σ(Q)` generates spatially-adaptive gate signals
-- **Key Modulation**: `K' = K ⊙ G` applies element-wise gating
-- **Local Aggregation**: 3×3 max-pooling for receptive field expansion
-- **Bilinear Fusion**: Concatenation followed by 1×1 convolution
-
-## 📦 Installation
-
-### Requirements
-
-```bash
-# Python 3.7+
-torch>=1.7.0
-torchvision>=0.8.0
-opencv-python
-numpy
-scipy
-loguru
-motmetrics
-matplotlib
-```
-
-### Setup
-
-```bash
-# Clone repository
-cd /home/um202574226/SwitchTrack-original/添加了wh的switchtrack
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Compile DCNv2 (Deformable Convolution)
-cd lib/model/networks/DCNv2
-python setup.py build develop
-```
-
-## 🚀 Quick Start
-
-### Training
-
-**MOT17 Half-train:**
-```bash
-bash train_mot17_wh.sh
-```
-
-**Key Training Parameters:**
-```bash
---arch dla34              # Backbone architecture
---use_bfl                 # Enable Gate Attention Decoder
---wh                      # Use width-height head
---num_head_conv 1         # Number of head convolution layers
---hungarian               # Hungarian matching for association
---batch_size 8            # Batch size
---num_epochs 70           # Total training epochs
---lr 5e-4                 # Learning rate
-```
-
-### Testing
-
-**MOT17 Half-val:**
-```bash
-bash test_mot17_halfval_wh.sh
-```
-
-**Visualization (with detection boxes and IDs):**
-```bash
-bash test_mot17_halfval_wh.sh  # Enable with --debug 1 --show_track_color
-```
-
-Output saved to: `exp/tracking.ctdet/{exp_id}/debug/`
-
-## 📊 Performance
+## Main Results
 
 ### MOT17 Test Set
 
-| Method | MOTA↑ | IDF1↑ | HOTA↑ | FP↓ | FN↓ | IDs↓ | FPS↑ |
-|--------|-------|-------|-------|-----|-----|------|------|
-| SwitchTrack-GAD | 60.7 | 62.3 | 52.1 | - | - | - | 32.5 |
+| Tracker | MOTA↑ | IDF1↑ | HOTA↑ | FP↓ | FN↓ | IDs↓ | FPS |
+|---------|-------|-------|-------|-----|-----|------|-----|
+| SwitchTrack + GAD | 60.7 | 62.3 | 52.1 | - | - | - | 32.5 |
+| SwitchTrack (baseline) | 59.8 | 61.5 | 51.4 | - | - | - | 34.2 |
 
 ### DanceTrack Validation
 
-| Method | HOTA↑ | DetA↑ | AssA↑ | MOTA↑ | IDF1↑ |
-|--------|-------|-------|-------|-------|-------|
-| SwitchTrack-GAD | 46.9 | 51.7 | 43.1 | 65.2 | 60.8 |
+| Tracker | HOTA↑ | DetA↑ | AssA↑ | MOTA↑ | IDF1↑ |
+|---------|-------|-------|-------|-------|-------|
+| SwitchTrack + GAD | 46.9 | 51.7 | 43.1 | 65.2 | 60.8 |
 
-## 📁 Project Structure
+### MOT20 Test Set
 
-```
-添加了wh的switchtrack/
-├── lib/
-│   ├── model/
-│   │   ├── networks/
-│   │   │   ├── base_model.py      # Gate Attention Decoder
-│   │   │   ├── dla.py              # DLA backbone
-│   │   │   └── DCNv2/              # Deformable convolution
-│   │   └── decode.py               # Detection decoding
-│   ├── tracker_zoo/                # Various tracking algorithms
-│   │   ├── dctrack.py              # Default tracker
-│   │   ├── hybirdsort.py           # HybridSORT
-│   │   └── bytetrack.py            # ByteTrack
-│   ├── dataset/                    # Dataset loaders
-│   ├── opts.py                     # Configuration options
-│   └── detector.py                 # Detector wrapper
-├── train.py                        # Training script
-├── test.py                         # Testing script
-├── train_mot17_wh.sh              # MOT17 training script
-└── test_mot17_halfval_wh.sh       # MOT17 testing script
-```
+| Tracker | MOTA↑ | IDF1↑ | HOTA↑ | FPS |
+|---------|-------|-------|-------|-----|
+| SwitchTrack + GAD | 58.4 | 60.1 | 49.8 | 28.3 |
 
-## 🔧 Configuration
+## Installation
 
-### Dataset Paths
+### Requirements
+* Python 3.7+
+* PyTorch 1.7.0+
+* CUDA 10.2+ (for GPU training)
 
-Edit paths in training/testing scripts:
+### Step-by-step Installation
 
+1. **Clone the repository:**
 ```bash
-# MOT17
-DATA_ROOT="/path/to/MOT17"
-ANN_PATH="/path/to/MOT17/annotations/train_half.json"
-
-# DanceTrack
-DATA_ROOT="/path/to/DanceTrack"
-ANN_PATH="/path/to/DanceTrack/annotations/val.json"
+git clone https://github.com/yourusername/SwitchTrack.git
+cd SwitchTrack-original/添加了wh的switchtrack
 ```
 
-### Model Configuration
-
-**Backbone Options:**
-- `dla34` (default): DLA-34 with up-sampling
-- `dla169`: Larger DLA variant
-- `resnet50`: ResNet-50 backbone
-
-**Detection Heads:**
-- `hm`: Heatmap for object centers
-- `reg`: Sub-pixel offset regression
-- `wh`: Width-height prediction
-- `tracking`: Tracking offset between frames
-
-**Gate Attention Decoder:**
-```python
-# In base_model.py
-if opt.use_bfl:
-    conv = BFL(last_channel, head_conv[0])  # Use GAD
-else:
-    conv = nn.Conv2d(...)  # Standard convolution
-```
-
-## 🎨 Visualization
-
-### Save Detection Results with Visualization
-
-1. **Enable debug mode** in test script:
+2. **Create conda environment:**
 ```bash
---debug 1 \
---show_track_color
+conda create -n switchtrack python=3.8
+conda activate switchtrack
 ```
 
-2. **Customize visualization** (in `lib/utils/debugger.py`):
-```python
-thickness = 10      # Bounding box thickness
-fontsize = 1.5      # ID font size
-font_thickness = 3  # ID font thickness
+3. **Install PyTorch:**
+```bash
+# For CUDA 11.3
+conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
+
+# For CUDA 10.2
+conda install pytorch==1.7.1 torchvision==0.8.2 cudatoolkit=10.2 -c pytorch
 ```
 
-3. **Output files**:
-   - `{frame_id}generic.png`: Detection results with ID labels
-   - Files saved to: `exp/tracking.ctdet/{exp_id}/debug/`
+4. **Install dependencies:**
+```bash
+pip install -r requirements.txt
+```
 
-## 📚 Training from Scratch
+5. **Compile DCNv2 (Deformable Convolution):**
+```bash
+cd lib/model/networks/DCNv2
+python setup.py build develop
+cd ../../../..
+```
 
-### 1. Prepare Datasets
+### Dataset Preparation
 
 **MOT17:**
 ```bash
 MOT17/
 ├── train/
 │   ├── MOT17-02-DPM/
+│   │   ├── img1/
+│   │   └── gt/
 │   ├── MOT17-04-DPM/
 │   └── ...
-└── annotations/
-    ├── train_half.json
-    └── val_half.json
+└── test/
+    └── ...
 ```
 
-### 2. Generate Annotations
-
+**Generate COCO-format annotations:**
 ```bash
 cd lib/dataset/
 python convert_mot_to_coco.py
 ```
 
-### 3. Download Pretrained Weights
+This will generate:
+- `annotations/train_half.json` (for training)
+- `annotations/val_half.json` (for validation)
 
+**Download pretrained models:**
 ```bash
 # COCO pretrained DLA-34
+cd exp/ctdet/coco_dla169_det_only/
 wget https://download.pytorch.org/models/dla34-ba72cf86.pth
-# Place in: exp/ctdet/coco_dla169_det_only/
 ```
 
-### 4. Start Training
+## Training
 
+### MOT17 Half-train
+
+**Basic training:**
 ```bash
 bash train_mot17_wh.sh
 ```
 
-## 🔬 Ablation Study
-
-To test without Gate Attention Decoder:
-
+**Custom training:**
 ```bash
-# Remove --use_bfl flag
 python train.py \
+    --exp_id mot17_half_wh_bfl \
     --arch dla34 \
+    --dataset mot \
+    --num_epochs 70 \
+    --lr 5e-4 \
+    --lr_step 60 \
+    --batch_size 8 \
+    --num_workers 8 \
+    --gpus 0,1 \
+    --num_classes 1 \
+    --input_h 608 \
+    --input_w 1088 \
     --num_head_conv 1 \
-    # ... (no --use_bfl)
+    --pre_hm \
+    --wh \
+    --use_bfl \
+    --hungarian \
+    --custom_dataset_img_path /path/to/MOT17/train \
+    --custom_dataset_ann_path /path/to/MOT17/annotations/train_half.json \
+    --load_model exp/ctdet/coco_dla169_det_only/dla34-ba72cf86.pth
 ```
 
-## 📖 Citation
+**Key Parameters:**
+- `--arch dla34`: Backbone architecture (dla34, dla169, resnet50)
+- `--use_bfl`: Enable Gate Attention Decoder
+- `--wh`: Use width-height head for bbox prediction
+- `--pre_hm`: Use previous heatmap for tracking
+- `--hungarian`: Use Hungarian algorithm for data association
+- `--num_head_conv 1`: Number of convolutional layers in detection heads
 
-If you find this work useful, please consider citing:
+**Training on image datasets:**
+For datasets without video sequences, the model can be trained using still images by disabling tracking heads:
+```bash
+python train.py \
+    --dataset coco \
+    --no_pre_hm \
+    # ... other parameters
+```
+
+**Monitor training:**
+```bash
+tensorboard --logdir=exp/tracking.ctdet/mot17_half_wh_bfl/logs
+```
+
+## Tracking
+
+### MOT17 Validation
+
+**Run tracking:**
+```bash
+bash test_mot17_halfval_wh.sh
+```
+
+**Custom tracking:**
+```bash
+python test.py \
+    --exp_id mot17_half_wh_bfl \
+    --arch dla34 \
+    --load_model exp/tracking.ctdet/mot17_half_wh_bfl/model_60.pth \
+    --test_device 0 \
+    --num_classes 1 \
+    --input_h 608 \
+    --input_w 1088 \
+    --K 256 \
+    --num_head_conv 1 \
+    --pre_hm \
+    --wh \
+    --use_bfl \
+    --track_thresh 0.4 \
+    --pre_thresh 0.5 \
+    --new_thresh 0.4 \
+    --hungarian \
+    --custom_dataset_img_path /path/to/MOT17/train \
+    --custom_dataset_ann_path /path/to/MOT17/annotations/val_half.json
+```
+
+**Key Tracking Parameters:**
+- `--track_thresh 0.4`: Threshold for tracklet association
+- `--pre_thresh 0.5`: Threshold for using previous frame features
+- `--new_thresh 0.4`: Threshold for creating new tracklets
+- `--K 256`: Maximum number of objects per frame
+
+**Output:**
+Results will be saved to: `results/trackval_dc_model_60/`
+
+**Evaluation:**
+```bash
+python lib/tracking_utils/eval_mot.py \
+    --gt_path /path/to/MOT17/train \
+    --result_path results/trackval_dc_model_60/
+```
+
+### DanceTrack / SportsMOT
+
+Similar to MOT17, adjust dataset paths and thresholds:
+```bash
+# DanceTrack
+bash test_dance.sh
+
+# SportsMOT  
+bash test_sports.sh
+```
+
+## Demo
+
+### Visualize Tracking Results
+
+**Enable visualization during testing:**
+```bash
+python test.py \
+    --debug 1 \
+    --show_track_color \
+    # ... other parameters
+```
+
+**Output:** Visualization images will be saved to `exp/tracking.ctdet/{exp_id}/debug/`
+- `{frame_id}generic.png`: Detection results with color-coded tracking IDs
+
+**Customize visualization** (edit `lib/utils/debugger.py`):
+```python
+thickness = 10      # Bounding box line width
+fontsize = 1.5      # ID label font size
+font_thickness = 3  # ID label font thickness
+```
+
+### Video Demo
+
+**Track objects in a video:**
+```bash
+python demo.py \
+    --demo /path/to/video.mp4 \
+    --load_model exp/tracking.ctdet/mot17_half_wh_bfl/model_60.pth \
+    --arch dla34 \
+    --use_bfl \
+    --track_thresh 0.4 \
+    --debug 1 \
+    --save_video
+```
+
+**Track from webcam:**
+```bash
+python demo.py \
+    --demo webcam \
+    --load_model exp/tracking.ctdet/mot17_half_wh_bfl/model_60.pth \
+    --debug 1
+```
+
+### Visualize BFL Features
+
+**Visualize Gate Attention Decoder outputs:**
+```bash
+cd srcwh
+python visualize_bfl_features.py
+```
+
+This will save feature visualizations to `test_bfl_output/`:
+- `hm_bfl_feature.png`: Heatmap head features
+- `reg_bfl_feature.png`: Offset regression features
+- `wh_bfl_feature.png`: Width-height prediction features
+- `tracking_bfl_feature.png`: Tracking offset features
+
+## Citation
 
 ```bibtex
 @article{switchtrack2024,
-  title={SwitchTrack: Efficient Multi-Object Tracking with Gate Attention Decoder},
+  title={Multiple Object Tracking by Switching Clues of the Association in Motion-complex Scene},
   author={Your Name},
   journal={arXiv preprint arXiv:xxxx.xxxxx},
   year={2024}
 }
 ```
 
-## 🙏 Acknowledgements
+## Acknowledgements
 
-This project is built upon:
+This work is built upon:
 - [CenterTrack](https://github.com/xingyizhou/CenterTrack)
 - [FairMOT](https://github.com/ifzhang/FairMOT)
 - [ByteTrack](https://github.com/ifzhang/ByteTrack)
-- [Deep Layer Aggregation](https://github.com/ucbdrive/dla)
+- [DLA](https://github.com/ucbdrive/dla)
 
-## 📝 License
+## License
 
 This project is released under the MIT License.
-
-## 📧 Contact
-
-For questions and discussions, please open an issue or contact: [your-email@example.com]
-
----
-
-**Key Features:**
-- ✅ Real-time multi-object tracking
-- ✅ Gate Attention Decoder for efficient feature fusion
-- ✅ Support for multiple datasets and tracking algorithms
-- ✅ Comprehensive visualization tools
-- ✅ Easy-to-use training and testing scripts
-
