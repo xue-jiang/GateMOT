@@ -1,5 +1,4 @@
 # GateMOT
-# SwitchTrack with Gate Attention Decoder
 
 A real-time multi-object tracking framework with Gate Attention Decoder (GAD) for efficient feature fusion.
 
