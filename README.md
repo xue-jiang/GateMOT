@@ -1,5 +1,7 @@
 # Mutiple Object Tracking by Switching Clues of the Association in Motion-complex Scene
 
+---
+
 ## Abstract
 
 This repository implements an online multiple object tracking (MOT) framework that uses a **Q-Gated Linear Attention (Q-Attention)** decoder to jointly perform detection, motion estimation, and ReID on a shared feature map.
@@ -10,7 +12,7 @@ Instead of standard self-attention with quadratic complexity, **Q-Attention turn
 - Robust association by **switching the effective clues** between motion and appearance depending on confidence and occlusion.
 - High efficiency in dense, motion-complex scenes where classical self-attention is too expensive.
 
-Key features:
+### Key features:
 
 - **Q-Gated Linear Attention decoder** for dense detection / motion / ReID heads.
 - Multi-head Q-Attention: **one head per task**, with task-adaptive spatial gates.
@@ -23,59 +25,60 @@ Key features:
 ## Main Results
 
 | Dataset     | HOTA | MOTA | IDF1 |  IDs | AssA | DetA |
-|------------|:----:|:----:|:----:|:----:|:----:|:----:|
-| BEE24      | 48.4 | 67.8 | 64.5 | 1058 |  --  | 44.7 |
-| MOT17      | 62.7 | 78.7 | 77.0 |  --  | 62.2 | 63.6 |
-| DanceTrack | 61.1 | 89.8 | 64.3 |  --  | 46.7 | 80.2 |
-| SportsMOT  | 75.3 | 96.2 | 78.7 |  --  | 64.6 | 87.8 |
+|:------------|:----:|:----:|:----:|:----:|:----:|:----:|
+| BEE24       | 48.4 | 67.8 | 64.5 | 1058 |  --  | 44.7 |
+| MOT17       | 62.7 | 78.7 | 77.0 |  --  | 62.2 | 63.6 |
+| DanceTrack  | 61.1 | 89.8 | 64.3 |  --  | 46.7 | 80.2 |
+| SportsMOT   | 75.3 | 96.2 | 78.7 |  --  | 64.6 | 87.8 |
+
+---
 
 ## Installation
 
 ### Requirements
-* Python 3.7+
-* PyTorch 1.7.0+
-* CUDA 10.2+ (for GPU training)
+- Python 3.7+
+- PyTorch 1.7.0+
+- CUDA 10.2+ (for GPU training)
 
 ### Step-by-step Installation
 
-1. **Clone the repository:**
-```bash
-git clone https://github.com/yourusername/SwitchTrack.git
-cd SwitchTrack-original/添加了wh的switchtrack
-```
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/yourusername/SwitchTrack.git
+    cd SwitchTrack-original/添加了wh的switchtrack
+    ```
 
-2. **Create conda environment:**
-```bash
-conda create -n switchtrack python=3.8
-conda activate switchtrack
-```
+2.  **Create conda environment:**
+    ```bash
+    conda create -n switchtrack python=3.8
+    conda activate switchtrack
+    ```
 
-3. **Install PyTorch:**
-```bash
-# For CUDA 11.3
-conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
+3.  **Install PyTorch:**
+    ```bash
+    # For CUDA 11.3
+    conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
 
-# For CUDA 10.2
-conda install pytorch==1.7.1 torchvision==0.8.2 cudatoolkit=10.2 -c pytorch
-```
+    # For CUDA 10.2
+    conda install pytorch==1.7.1 torchvision==0.8.2 cudatoolkit=10.2 -c pytorch
+    ```
 
-4. **Install dependencies:**
-```bash
-pip install -r requirements.txt
-```
+4.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-5. **Compile DCNv2 (Deformable Convolution):**
-```bash
-cd DCNv2
-python setup.py build develop
-cd ..
-```
+5.  **Compile DCNv2 (Deformable Convolution):**
+    ```bash
+    cd DCNv2
+    python setup.py build develop
+    cd ..
+    ```
 
 ### Dataset Preparation
 
 #### BEE24
-
-```
+```plaintext
 {Data ROOT}
 |-- bee24
 |   |-- train
@@ -100,8 +103,7 @@ cd ..
 ```
 
 #### MOT17
-
-```
+```plaintext
 {Data ROOT}
 |-- mot
 |   |-- train
@@ -126,8 +128,7 @@ cd ..
 ```
 
 #### DanceTrack
-
-```
+```plaintext
 {Data ROOT}
 |-- dancetrack
 |   |-- train
@@ -146,8 +147,7 @@ cd ..
 ```
 
 #### SportsMOT
-
-```
+```plaintext
 {Data ROOT}
 |-- sportsmot
 |   |-- splits_txt
@@ -169,7 +169,6 @@ cd ..
 ```
 
 #### Generate COCO-format Annotations
-
 ```bash
 cd lib/tools/
 python convert_bee_to_coco.py
@@ -184,6 +183,8 @@ python convert_sportsmot_to_coco.py
 cd pretrain/
 wget http://dl.yf.io/dla/models/imagenet/dla34-ba72cf86.pth
 ```
+
+---
 
 ## Training
 
@@ -314,7 +315,8 @@ python train.py \
     --load_model pretrain/dla34-ba72cf86.pth
 ```
 
-**Key Parameters:**
+### Key Parameters:
+
 - `--arch dla34`: Backbone architecture (dla34, dla169, resnet50)
 - `--use_bfl`: Enable Gate Attention Decoder
 - `--wh`: Use width-height head for bbox prediction
@@ -322,10 +324,12 @@ python train.py \
 - `--hungarian`: Use Hungarian algorithm for data association
 - `--num_head_conv 1`: Number of convolutional layers in detection heads
 
-**Monitor training:**
+### Monitor training:
 ```bash
 tensorboard --logdir=exp/tracking.ctdet/mot17_half_wh_bfl/logs
 ```
+
+---
 
 ## Tracking
 
@@ -366,6 +370,7 @@ python test.py \
 - `--K 256`: Maximum number of objects per frame
 
 **Output:**
+
 Results will be saved to: `results/trackval_dc_model_60/`
 
 **Evaluation:**
@@ -390,6 +395,8 @@ bash test_dance.sh
 bash test_sports.sh
 ```
 
+---
+
 ## Demo
 
 ### Visualize Tracking Results
@@ -402,7 +409,9 @@ python test.py \
     # ... other parameters
 ```
 
-**Output:** Visualization images will be saved to `exp/tracking.ctdet/{exp_id}/debug/`
+**Output:** 
+
+Visualization images will be saved to `exp/tracking.ctdet/{exp_id}/debug/`
 - `{frame_id}generic.png`: Detection results with color-coded tracking IDs
 
 **Customize visualization** (edit `lib/utils/debugger.py`):
@@ -448,6 +457,8 @@ This will save feature visualizations to `test_bfl_output/`:
 - `wh_bfl_feature.png`: Width-height prediction features
 - `tracking_bfl_feature.png`: Tracking offset features
 
+---
+
 ## Citation
 
 ```bibtex
@@ -459,6 +470,8 @@ This will save feature visualizations to `test_bfl_output/`:
 }
 ```
 
+---
+
 ## Acknowledgements
 
 This work is built upon:
@@ -466,6 +479,8 @@ This work is built upon:
 - [FairMOT](https://github.com/ifzhang/FairMOT)
 - [ByteTrack](https://github.com/ifzhang/ByteTrack)
 - [DLA](https://github.com/ucbdrive/dla)
+
+---
 
 ## License
 
