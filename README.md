@@ -435,28 +435,6 @@ python demo.py \
     --save_video
 ```
 
-**Track from webcam:**
-```bash
-python demo.py \
-    --demo webcam \
-    --load_model exp/tracking.ctdet/mot17_half_wh_bfl/model_60.pth \
-    --debug 1
-```
-
-### Visualize BFL Features
-
-**Visualize Gate Attention Decoder outputs:**
-```bash
-cd srcwh
-python visualize_bfl_features.py
-```
-
-This will save feature visualizations to `test_bfl_output/`:
-- `hm_bfl_feature.png`: Heatmap head features
-- `reg_bfl_feature.png`: Offset regression features
-- `wh_bfl_feature.png`: Width-height prediction features
-- `tracking_bfl_feature.png`: Tracking offset features
-
 ---
 
 ## Citation
