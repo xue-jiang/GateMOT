@@ -75,49 +75,159 @@ cd ..
 
 ### Dataset Preparation
 
-**MOT17:**
+**Datasets:**
+
+# BEE24 #
 ```bash
-MOT17/
-├── train/
-│   ├── MOT17-02-DPM/
-│   │   ├── img1/
-│   │   └── gt/
-│   ├── MOT17-04-DPM/
-│   └── ...
-└── test/
-    └── ...
+{Data ROOT}
+|-- bee24
+|   |-- train
+|   |   |-- BEE24-01
+|   |   |   |-- img1
+|   |   |   |   |-- 000001.jpg
+|   |   |   |   |-- ...
+|   |   |   |-- gt
+|   |   |   |   |-- gt.txt            
+|   |   |   |-- seqinfo.ini
+|   |   |-- ...
+|   |   |-- BEE24-35
+|   |   |   |-- img1
+|   |   |   |   |-- 000001.jpg
+|   |   |   |   |-- ...
+|   |   |   |-- gt
+|   |   |   |   |-- gt.txt            
+|   |   |   |-- seqinfo.ini
+|   |   |-- ...
+|   |-- test
+|   |   |-- ...
 ```
+
+# MOT17 #
+```bash
+{Data ROOT}
+|-- mot
+|   |-- train
+|   |   |-- MOT17-02
+|   |   |   |-- img1
+|   |   |   |   |-- 000001.jpg
+|   |   |   |   |-- ...
+|   |   |   |-- gt
+|   |   |   |   |-- gt.txt            
+|   |   |   |-- seqinfo.ini
+|   |   |-- ...
+|   |   |-- MOT20-01
+|   |   |   |-- img1
+|   |   |   |   |-- 000001.jpg
+|   |   |   |   |-- ...
+|   |   |   |-- gt
+|   |   |   |   |-- gt.txt            
+|   |   |   |-- seqinfo.ini
+|   |   |-- ...
+|   |-- test
+|   |   |-- ...
+
+```
+
+# DanceTrack #
+```bash
+{Data ROOT}
+|-- dancetrack
+|   |-- train
+|   |   |-- dancetrack0001
+|   |   |   |-- img1
+|   |   |   |   |-- 00000001.jpg
+|   |   |   |   |-- ...
+|   |   |   |-- gt
+|   |   |   |   |-- gt.txt            
+|   |   |   |-- seqinfo.ini
+|   |   |-- ...
+|   |-- val
+|   |   |-- ...
+|   |-- test
+|   |   |-- ...
+```
+
+# SportsMOT #
+{Data ROOT}
+|-- sportsmot
+|   |-- splits_txt
+|   |-- scripts
+|   |-- dataset
+|   |   |-- train
+|   |   |   |-- v_1LwtoLPw2TU_c006
+|   |   |   |   |-- img1
+|   |   |   |   |   |-- 000001.jpg
+|   |   |   |   |   |-- ...
+|   |   |   |   |-- gt
+|   |   |   |   |   |-- gt.txt
+|   |   |   |   |-- seqinfo.ini         
+|   |   |   |-- ...
+|   |   |-- val
+|   |   |   |-- ...
+|   |   |-- test
+|   |   |   |-- ...
 
 **Generate COCO-format annotations:**
 ```bash
-cd lib/dataset/
-python convert_mot_to_coco.py
+cd lib/tools/
+python convert_bee_to_coco.py
+python convert_mot17_to_coco.py
+python convert_dance_to_coco.py
+python convert_sportsmot_to_coco.py
 ```
 
-This will generate:
-- `annotations/train_half.json` (for training)
-- `annotations/val_half.json` (for validation)
 
 **Download pretrained models:**
 ```bash
-# COCO pretrained DLA-34
-cd exp/ctdet/coco_dla169_det_only/
-wget https://download.pytorch.org/models/dla34-ba72cf86.pth
+# ImageNet pretrained DLA-34
+cd pretrain/
+wget http://dl.yf.io/dla/models/imagenet/dla34-ba72cf86.pth
 ```
 
 ## Training
 
-### MOT17 Half-train
+### BEE24 
 
 **Basic training:**
 ```bash
-bash train_mot17_wh.sh
+bash train_bee.sh
 ```
 
 **Custom training:**
 ```bash
 python train.py \
-    --exp_id mot17_half_wh_bfl \
+    --exp_id bee \
+    --arch dla34 \
+    --dataset mot \
+    --num_epochs 70 \
+    --lr 5e-4 \
+    --lr_step 60 \
+    --batch_size 8 \
+    --num_workers 8 \
+    --gpus 0,1 \
+    --num_classes 1 \
+    --input_h 608 \
+    --input_w 1088 \
+    --num_head_conv 1 \
+    --pre_hm \
+    --use_bfl \
+    --hungarian \
+    --custom_dataset_img_path /path/to/bee/train \
+    --custom_dataset_ann_path /path/to/bee/annotations/train.json \
+    --load_model pretrain/dla34-ba72cf86.pth
+```
+
+### MOT17 
+
+**Basic training:**
+```bash
+bash train_mot17.sh
+```
+
+**Custom training:**
+```bash
+python train.py \
+    --exp_id mot17 \
     --arch dla34 \
     --dataset mot \
     --num_epochs 70 \
@@ -135,9 +245,75 @@ python train.py \
     --use_bfl \
     --hungarian \
     --custom_dataset_img_path /path/to/MOT17/train \
-    --custom_dataset_ann_path /path/to/MOT17/annotations/train_half.json \
-    --load_model exp/ctdet/coco_dla169_det_only/dla34-ba72cf86.pth
+    --custom_dataset_ann_path /path/to/MOT17/annotations/train.json \
+    --load_model pretrain/dla34-ba72cf86.pth
 ```
+
+### DanceTrack 
+
+**Basic training:**
+```bash
+bash train_dance.sh
+```
+
+**Custom training:**
+```bash
+python train.py \
+    --exp_id dance \
+    --arch dla34 \
+    --dataset mot \
+    --num_epochs 70 \
+    --lr 5e-4 \
+    --lr_step 60 \
+    --batch_size 8 \
+    --num_workers 8 \
+    --gpus 0,1 \
+    --num_classes 1 \
+    --input_h 608 \
+    --input_w 1088 \
+    --num_head_conv 1 \
+    --pre_hm \
+    --wh \
+    --use_bfl \
+    --hungarian \
+    --custom_dataset_img_path /path/to/dancetrack/train \
+    --custom_dataset_ann_path /path/to/dancetrack/annotations/train.json \
+    --load_model pretrain/dla34-ba72cf86.pth
+```
+
+
+### SportsMOT 
+
+**Basic training:**
+```bash
+bash train_sports.sh
+```
+
+**Custom training:**
+```bash
+python train.py \
+    --exp_id sports \
+    --arch dla34 \
+    --dataset mot \
+    --num_epochs 70 \
+    --lr 5e-4 \
+    --lr_step 60 \
+    --batch_size 8 \
+    --num_workers 8 \
+    --gpus 0,1 \
+    --num_classes 1 \
+    --input_h 608 \
+    --input_w 1088 \
+    --num_head_conv 1 \
+    --pre_hm \
+    --wh \
+    --use_bfl \
+    --hungarian \
+    --custom_dataset_img_path /path/to/sportsmot/train \
+    --custom_dataset_ann_path /path/to/sportsmot/annotations/train.json \
+    --load_model pretrain/dla34-ba72cf86.pth
+```
+
 
 **Key Parameters:**
 - `--arch dla34`: Backbone architecture (dla34, dla169, resnet50)
