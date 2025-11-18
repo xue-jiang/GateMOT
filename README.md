@@ -1,4 +1,4 @@
-# Mutiple Object Tracking by Switching Clues of the Association in Motion-complex Scene
+# Multiple Object Tracking by Switching Clues of the Association in Motion-complex Scene
 
 ---
 
@@ -12,7 +12,7 @@ Instead of standard self-attention with quadratic complexity, **Q-Attention turn
 - Robust association by **switching the effective clues** between motion and appearance depending on confidence and occlusion.
 - High efficiency in dense, motion-complex scenes where classical self-attention is too expensive.
 
-### Key features:
+### Key Features
 
 - **Q-Gated Linear Attention decoder** for dense detection / motion / ReID heads.
 - Multi-head Q-Attention: **one head per task**, with task-adaptive spatial gates.
@@ -42,42 +42,48 @@ Instead of standard self-attention with quadratic complexity, **Q-Attention turn
 
 ### Step-by-step Installation
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/yourusername/SwitchTrack.git
-    cd SwitchTrack-original/添加了wh的switchtrack
-    ```
+1. **Clone the repository:**
 
-2.  **Create conda environment:**
-    ```bash
-    conda create -n switchtrack python=3.8
-    conda activate switchtrack
-    ```
+```bash
+git clone https://github.com/yourusername/SwitchTrack.git
+cd SwitchTrack-original/添加了wh的switchtrack
+```
 
-3.  **Install PyTorch:**
-    ```bash
-    # For CUDA 11.3
-    conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
+2. **Create conda environment:**
 
-    # For CUDA 10.2
-    conda install pytorch==1.7.1 torchvision==0.8.2 cudatoolkit=10.2 -c pytorch
-    ```
+```bash
+conda create -n switchtrack python=3.8
+conda activate switchtrack
+```
 
-4.  **Install dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+3. **Install PyTorch:**
 
-5.  **Compile DCNv2 (Deformable Convolution):**
-    ```bash
-    cd DCNv2
-    python setup.py build develop
-    cd ..
-    ```
+```bash
+# For CUDA 11.3
+conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
+
+# For CUDA 10.2
+conda install pytorch==1.7.1 torchvision==0.8.2 cudatoolkit=10.2 -c pytorch
+```
+
+4. **Install dependencies:**
+
+```bash
+pip install -r requirements.txt
+```
+
+5. **Compile DCNv2 (Deformable Convolution):**
+
+```bash
+cd DCNv2
+python setup.py build develop
+cd ..
+```
 
 ### Dataset Preparation
 
 #### BEE24
+
 ```plaintext
 {Data ROOT}
 |-- bee24
@@ -87,7 +93,7 @@ Instead of standard self-attention with quadratic complexity, **Q-Attention turn
 |   |   |   |   |-- 000001.jpg
 |   |   |   |   |-- ...
 |   |   |   |-- gt
-|   |   |   |   |-- gt.txt            
+|   |   |   |   |-- gt.txt
 |   |   |   |-- seqinfo.ini
 |   |   |-- ...
 |   |   |-- BEE24-35
@@ -95,7 +101,7 @@ Instead of standard self-attention with quadratic complexity, **Q-Attention turn
 |   |   |   |   |-- 000001.jpg
 |   |   |   |   |-- ...
 |   |   |   |-- gt
-|   |   |   |   |-- gt.txt            
+|   |   |   |   |-- gt.txt
 |   |   |   |-- seqinfo.ini
 |   |   |-- ...
 |   |-- test
@@ -103,6 +109,7 @@ Instead of standard self-attention with quadratic complexity, **Q-Attention turn
 ```
 
 #### MOT17
+
 ```plaintext
 {Data ROOT}
 |-- mot
@@ -112,7 +119,7 @@ Instead of standard self-attention with quadratic complexity, **Q-Attention turn
 |   |   |   |   |-- 000001.jpg
 |   |   |   |   |-- ...
 |   |   |   |-- gt
-|   |   |   |   |-- gt.txt            
+|   |   |   |   |-- gt.txt
 |   |   |   |-- seqinfo.ini
 |   |   |-- ...
 |   |   |-- MOT20-01
@@ -120,7 +127,7 @@ Instead of standard self-attention with quadratic complexity, **Q-Attention turn
 |   |   |   |   |-- 000001.jpg
 |   |   |   |   |-- ...
 |   |   |   |-- gt
-|   |   |   |   |-- gt.txt            
+|   |   |   |   |-- gt.txt
 |   |   |   |-- seqinfo.ini
 |   |   |-- ...
 |   |-- test
@@ -128,6 +135,7 @@ Instead of standard self-attention with quadratic complexity, **Q-Attention turn
 ```
 
 #### DanceTrack
+
 ```plaintext
 {Data ROOT}
 |-- dancetrack
@@ -137,7 +145,7 @@ Instead of standard self-attention with quadratic complexity, **Q-Attention turn
 |   |   |   |   |-- 00000001.jpg
 |   |   |   |   |-- ...
 |   |   |   |-- gt
-|   |   |   |   |-- gt.txt            
+|   |   |   |   |-- gt.txt
 |   |   |   |-- seqinfo.ini
 |   |   |-- ...
 |   |-- val
@@ -147,6 +155,7 @@ Instead of standard self-attention with quadratic complexity, **Q-Attention turn
 ```
 
 #### SportsMOT
+
 ```plaintext
 {Data ROOT}
 |-- sportsmot
@@ -160,7 +169,7 @@ Instead of standard self-attention with quadratic complexity, **Q-Attention turn
 |   |   |   |   |   |-- ...
 |   |   |   |   |-- gt
 |   |   |   |   |   |-- gt.txt
-|   |   |   |   |-- seqinfo.ini         
+|   |   |   |   |-- seqinfo.ini
 |   |   |   |-- ...
 |   |   |-- val
 |   |   |   |-- ...
@@ -169,6 +178,7 @@ Instead of standard self-attention with quadratic complexity, **Q-Attention turn
 ```
 
 #### Generate COCO-format Annotations
+
 ```bash
 cd lib/tools/
 python convert_bee_to_coco.py
@@ -178,6 +188,7 @@ python convert_sportsmot_to_coco.py
 ```
 
 #### Download Pretrained Models
+
 ```bash
 # ImageNet pretrained DLA-34
 cd pretrain/
@@ -315,7 +326,7 @@ python train.py \
     --load_model pretrain/dla34-ba72cf86.pth
 ```
 
-### Key Parameters:
+### Key Parameters
 
 - `--arch dla34`: Backbone architecture (dla34, dla169, resnet50)
 - `--use_bfl`: Enable Gate Attention Decoder
@@ -324,7 +335,8 @@ python train.py \
 - `--hungarian`: Use Hungarian algorithm for data association
 - `--num_head_conv 1`: Number of convolutional layers in detection heads
 
-### Monitor training:
+### Monitor Training
+
 ```bash
 tensorboard --logdir=exp/tracking.ctdet/mot17_half_wh_bfl/logs
 ```
@@ -363,17 +375,19 @@ python test.py \
     --custom_dataset_ann_path /path/to/MOT17/annotations/val_half.json
 ```
 
-**Key Tracking Parameters:**
+### Key Tracking Parameters
+
 - `--track_thresh 0.4`: Threshold for tracklet association
 - `--pre_thresh 0.5`: Threshold for using previous frame features
 - `--new_thresh 0.4`: Threshold for creating new tracklets
 - `--K 256`: Maximum number of objects per frame
 
-**Output:**
+### Output
 
 Results will be saved to: `results/trackval_dc_model_60/`
 
-**Evaluation:**
+### Evaluation
+
 ```bash
 python lib/tracking_utils/eval_mot.py \
     --gt_path /path/to/MOT17/train \
@@ -402,6 +416,7 @@ bash test_sports.sh
 ### Visualize Tracking Results
 
 **Enable visualization during testing:**
+
 ```bash
 python test.py \
     --debug 1 \
@@ -409,12 +424,13 @@ python test.py \
     # ... other parameters
 ```
 
-**Output:** 
+**Output:**
 
 Visualization images will be saved to `exp/tracking.ctdet/{exp_id}/debug/`
 - `{frame_id}generic.png`: Detection results with color-coded tracking IDs
 
 **Customize visualization** (edit `lib/utils/debugger.py`):
+
 ```python
 thickness = 10      # Bounding box line width
 fontsize = 1.5      # ID label font size
@@ -424,6 +440,7 @@ font_thickness = 3  # ID label font thickness
 ### Video Demo
 
 **Track objects in a video:**
+
 ```bash
 python demo.py \
     --demo /path/to/video.mp4 \
@@ -452,7 +469,8 @@ python demo.py \
 
 ## Acknowledgements
 
-This work is built upon:
+This work is built upon the following excellent projects:
+
 - [CenterTrack](https://github.com/xingyizhou/CenterTrack)
 - [FairMOT](https://github.com/ifzhang/FairMOT)
 - [ByteTrack](https://github.com/ifzhang/ByteTrack)
