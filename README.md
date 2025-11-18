@@ -189,10 +189,10 @@ python convert_sportsmot_to_coco.py
 ```bash
 cd pretrain/
 
-# ImageNet pretrained DLA-34 (for MOT17, BEE24, DanceTrack)
+# ImageNet pretrained DLA-34 
 wget http://dl.yf.io/dla/models/imagenet/dla34-ba72cf86.pth
 
-# ImageNet pretrained DLA-60 (for SportsMOT)
+# ImageNet pretrained DLA-60 
 wget http://dl.yf.io/dla/models/imagenet/dla60-24839fc4.pth
 ```
 
