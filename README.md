@@ -338,7 +338,7 @@ python train.py \
 ### Monitor Training
 
 ```bash
-tensorboard --logdir=exp/tracking.ctdet/mot17_half_wh_bfl/logs
+tensorboard --logdir=exp/tracking.ctdet/mot17/logs
 ```
 
 ---
@@ -357,7 +357,7 @@ bash test_mot17.sh
 python test.py \
     --exp_id mot17 \
     --arch dla34 \
-    --load_model exp/tracking.ctdet/mot17_half_wh_bfl/model_60.pth \
+    --load_model exp/tracking.ctdet/mot17/model_60.pth \
     --test_device 0 \
     --num_classes 1 \
     --input_h 608 \
@@ -371,8 +371,8 @@ python test.py \
     --pre_thresh 0.5 \
     --new_thresh 0.4 \
     --hungarian \
-    --custom_dataset_img_path /path/to/MOT17/train \
-    --custom_dataset_ann_path /path/to/MOT17/annotations/val_half.json
+    --custom_dataset_img_path /path/to/MOT17/test \
+    --custom_dataset_ann_path /path/to/MOT17/annotations/test.json
 ```
 
 ### Key Tracking Parameters
@@ -389,7 +389,7 @@ Results will be saved to: `results/trackval_dc_model_60/`
 ### Evaluation
 
 ```bash
-python lib/tracking_utils/eval_mot.py \
+python lib/tools/eval_hota.py \
     --gt_path /path/to/MOT17/train \
     --result_path results/trackval_dc_model_60/
 ```
