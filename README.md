@@ -68,9 +68,9 @@ pip install -r requirements.txt
 
 5. **Compile DCNv2 (Deformable Convolution):**
 ```bash
-cd lib/model/networks/DCNv2
+cd DCNv2
 python setup.py build develop
-cd ../../../..
+cd ..
 ```
 
 ### Dataset Preparation
