@@ -20,9 +20,7 @@ Key features:
 
 ---
 
-## Main results
-
-
+## Main Results
 
 | Dataset     | HOTA | MOTA | IDF1 |  IDs | AssA | DetA |
 |------------|:----:|:----:|:----:|:----:|:----:|:----:|
@@ -75,10 +73,9 @@ cd ..
 
 ### Dataset Preparation
 
-**Datasets:**
+#### BEE24
 
-# BEE24 #
-```bash
+```
 {Data ROOT}
 |-- bee24
 |   |-- train
@@ -102,8 +99,9 @@ cd ..
 |   |   |-- ...
 ```
 
-# MOT17 #
-```bash
+#### MOT17
+
+```
 {Data ROOT}
 |-- mot
 |   |-- train
@@ -125,11 +123,11 @@ cd ..
 |   |   |-- ...
 |   |-- test
 |   |   |-- ...
-
 ```
 
-# DanceTrack #
-```bash
+#### DanceTrack
+
+```
 {Data ROOT}
 |-- dancetrack
 |   |-- train
@@ -147,7 +145,9 @@ cd ..
 |   |   |-- ...
 ```
 
-# SportsMOT #
+#### SportsMOT
+
+```
 {Data ROOT}
 |-- sportsmot
 |   |-- splits_txt
@@ -166,8 +166,10 @@ cd ..
 |   |   |   |-- ...
 |   |   |-- test
 |   |   |   |-- ...
+```
 
-**Generate COCO-format annotations:**
+#### Generate COCO-format Annotations
+
 ```bash
 cd lib/tools/
 python convert_bee_to_coco.py
@@ -176,8 +178,7 @@ python convert_dance_to_coco.py
 python convert_sportsmot_to_coco.py
 ```
 
-
-**Download pretrained models:**
+#### Download Pretrained Models
 ```bash
 # ImageNet pretrained DLA-34
 cd pretrain/
@@ -186,7 +187,7 @@ wget http://dl.yf.io/dla/models/imagenet/dla34-ba72cf86.pth
 
 ## Training
 
-### BEE24 
+### BEE24
 
 **Basic training:**
 ```bash
@@ -217,7 +218,7 @@ python train.py \
     --load_model pretrain/dla34-ba72cf86.pth
 ```
 
-### MOT17 
+### MOT17
 
 **Basic training:**
 ```bash
@@ -249,7 +250,7 @@ python train.py \
     --load_model pretrain/dla34-ba72cf86.pth
 ```
 
-### DanceTrack 
+### DanceTrack
 
 **Basic training:**
 ```bash
@@ -281,8 +282,7 @@ python train.py \
     --load_model pretrain/dla34-ba72cf86.pth
 ```
 
-
-### SportsMOT 
+### SportsMOT
 
 **Basic training:**
 ```bash
@@ -314,7 +314,6 @@ python train.py \
     --load_model pretrain/dla34-ba72cf86.pth
 ```
 
-
 **Key Parameters:**
 - `--arch dla34`: Backbone architecture (dla34, dla169, resnet50)
 - `--use_bfl`: Enable Gate Attention Decoder
@@ -322,15 +321,6 @@ python train.py \
 - `--pre_hm`: Use previous heatmap for tracking
 - `--hungarian`: Use Hungarian algorithm for data association
 - `--num_head_conv 1`: Number of convolutional layers in detection heads
-
-**Training on image datasets:**
-For datasets without video sequences, the model can be trained using still images by disabling tracking heads:
-```bash
-python train.py \
-    --dataset coco \
-    --no_pre_hm \
-    # ... other parameters
-```
 
 **Monitor training:**
 ```bash
@@ -343,13 +333,13 @@ tensorboard --logdir=exp/tracking.ctdet/mot17_half_wh_bfl/logs
 
 **Run tracking:**
 ```bash
-bash test_mot17_halfval_wh.sh
+bash test_mot17.sh
 ```
 
 **Custom tracking:**
 ```bash
 python test.py \
-    --exp_id mot17_half_wh_bfl \
+    --exp_id mot17 \
     --arch dla34 \
     --load_model exp/tracking.ctdet/mot17_half_wh_bfl/model_60.pth \
     --test_device 0 \
@@ -385,10 +375,14 @@ python lib/tracking_utils/eval_mot.py \
     --result_path results/trackval_dc_model_60/
 ```
 
-### DanceTrack / SportsMOT
+### DanceTrack / SportsMOT / BEE24
 
 Similar to MOT17, adjust dataset paths and thresholds:
+
 ```bash
+# BEE24
+bash test_bee.sh
+
 # DanceTrack
 bash test_dance.sh
 
