@@ -1,35 +1,35 @@
-# Multiple Object Tracking by Switching Clues of the Association in Motion-complex Scene
+# Mutiple Object Tracking by Switching Clues of the Association in Motion-complex Scene
 
 ## Abstract
 
-This project presents an efficient multi-object tracking framework designed for motion-complex scenarios. We introduce a Gate Attention Decoder (GAD) that employs learnable gating mechanisms to selectively emphasize discriminative features while maintaining computational efficiency. The decoder achieves O(HW) complexity through element-wise operations and local pooling, significantly more efficient than standard self-attention's O(H²W²) complexity. Our method demonstrates strong performance across multiple MOT benchmarks including MOT17, MOT20, DanceTrack, and SportsMOT.
+This repository implements an online multiple object tracking (MOT) framework that uses a **Q-Gated Linear Attention (Q-Attention)** decoder to jointly perform detection, motion estimation, and ReID on a shared feature map.
 
-**Key Features:**
-- Gate Attention Decoder for efficient feature fusion
-- Real-time performance (30+ FPS on single GPU)
-- Support for multiple tracking algorithms (Hungarian, ByteTrack, DeepSORT, etc.)
+Instead of standard self-attention with quadratic complexity, **Q-Attention turns the Query into a spatial gate** that directly filters Key features and fuses them with the original Value features in a **linear-complexity** way. Different Q-Attention heads are used for different tasks (detection / motion / ReID), which allows:
+
+- Task-specific feature selection while keeping the backbone **fully shared**.
+- Robust association by **switching the effective clues** between motion and appearance depending on confidence and occlusion.
+- High efficiency in dense, motion-complex scenes where classical self-attention is too expensive.
+
+Key features:
+
+- **Q-Gated Linear Attention decoder** for dense detection / motion / ReID heads.
+- Multi-head Q-Attention: **one head per task**, with task-adaptive spatial gates.
+- Association strategy that implicitly **switches clues** between motion and appearance via confidence-aware fusion.
 - The model can be trained on still **image datasets** if videos are not available.
+- Ready for standard MOT benchmarks (e.g. MOT17, DanceTrack, SportsMOT) and custom datasets (BEE24).
 
-## Main Results
+---
 
-### MOT17 Test Set
+## Main results
 
-| Tracker | MOTA↑ | IDF1↑ | HOTA↑ | FP↓ | FN↓ | IDs↓ | FPS |
-|---------|-------|-------|-------|-----|-----|------|-----|
-| SwitchTrack + GAD | 60.7 | 62.3 | 52.1 | - | - | - | 32.5 |
-| SwitchTrack (baseline) | 59.8 | 61.5 | 51.4 | - | - | - | 34.2 |
 
-### DanceTrack Validation
 
-| Tracker | HOTA↑ | DetA↑ | AssA↑ | MOTA↑ | IDF1↑ |
-|---------|-------|-------|-------|-------|-------|
-| SwitchTrack + GAD | 46.9 | 51.7 | 43.1 | 65.2 | 60.8 |
-
-### MOT20 Test Set
-
-| Tracker | MOTA↑ | IDF1↑ | HOTA↑ | FPS |
-|---------|-------|-------|-------|-----|
-| SwitchTrack + GAD | 58.4 | 60.1 | 49.8 | 28.3 |
+| Dataset     | HOTA | MOTA | IDF1 |  IDs | AssA | DetA |
+|------------|:----:|:----:|:----:|:----:|:----:|:----:|
+| BEE24      | 48.4 | 67.8 | 64.5 | 1058 |  --  | 44.7 |
+| MOT17      | 62.7 | 78.7 | 77.0 |  --  | 62.2 | 63.6 |
+| DanceTrack | 61.1 | 89.8 | 64.3 |  --  | 46.7 | 80.2 |
+| SportsMOT  | 75.3 | 96.2 | 78.7 |  --  | 64.6 | 87.8 |
 
 ## Installation
 
