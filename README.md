@@ -45,8 +45,8 @@ Instead of standard self-attention with quadratic complexity, **Q-Attention turn
 1. **Clone the repository:**
 
 ```bash
-git clone https://github.com/yourusername/SwitchTrack.git
-cd SwitchTrack-original/添加了wh的switchtrack
+git clone https://github.com/xue-jiang/GateMOT.git
+cd GateMOT
 ```
 
 2. **Create conda environment:**
