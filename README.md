@@ -159,22 +159,19 @@ cd ..
 ```plaintext
 {Data ROOT}
 |-- sportsmot
-|   |-- splits_txt
-|   |-- scripts
-|   |-- dataset
-|   |   |-- train
-|   |   |   |-- v_1LwtoLPw2TU_c006
-|   |   |   |   |-- img1
-|   |   |   |   |   |-- 000001.jpg
-|   |   |   |   |   |-- ...
-|   |   |   |   |-- gt
-|   |   |   |   |   |-- gt.txt
-|   |   |   |   |-- seqinfo.ini
-|   |   |   |-- ...
-|   |   |-- val
-|   |   |   |-- ...
-|   |   |-- test
-|   |   |   |-- ...
+|   |-- train
+|   |   |-- v_1LwtoLPw2TU_c006
+|   |   |   |-- img1
+|   |   |   |   |-- 000001.jpg
+|   |   |   |   |-- ...
+|   |   |   |-- gt
+|   |   |   |   |-- gt.txt
+|   |   |   |-- seqinfo.ini
+|   |   |-- ...
+|   |-- val
+|   |   |-- ...
+|   |-- test
+|   |   |-- ...
 ```
 
 #### Generate COCO-format Annotations
