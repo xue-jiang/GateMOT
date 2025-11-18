@@ -1,6 +1,6 @@
 # Multiple Object Tracking by Switching Clues of the Association in Motion-complex Scene
 
----
+
 
 ## Abstract
 
@@ -20,7 +20,7 @@ Instead of standard self-attention with quadratic complexity, **Q-Attention turn
 - The model can be trained on still **image datasets** if videos are not available.
 - Ready for standard MOT benchmarks (e.g. MOT17, DanceTrack, SportsMOT) and custom datasets (BEE24).
 
----
+
 
 ## Main Results
 
@@ -31,7 +31,7 @@ Instead of standard self-attention with quadratic complexity, **Q-Attention turn
 | DanceTrack  | 61.1 | 89.8 | 64.3 |  --  | 46.7 | 80.2 |
 | SportsMOT   | 75.3 | 96.2 | 78.7 |  --  | 64.6 | 87.8 |
 
----
+
 
 ## Installation
 
@@ -190,12 +190,16 @@ python convert_sportsmot_to_coco.py
 #### Download Pretrained Models
 
 ```bash
-# ImageNet pretrained DLA-34
 cd pretrain/
+
+# ImageNet pretrained DLA-34 (for MOT17, BEE24, DanceTrack)
 wget http://dl.yf.io/dla/models/imagenet/dla34-ba72cf86.pth
+
+# ImageNet pretrained DLA-60 (for SportsMOT)
+wget http://dl.yf.io/dla/models/imagenet/dla60-24839fc4.pth
 ```
 
----
+
 
 ## Training
 
@@ -212,18 +216,19 @@ python train.py \
     --exp_id bee \
     --arch dla34 \
     --dataset mot \
-    --num_epochs 70 \
-    --lr 5e-4 \
-    --lr_step 60 \
-    --batch_size 8 \
-    --num_workers 8 \
-    --gpus 0,1 \
+    --num_epochs 60 \
+    --lr 2e-4 \
+    --lr_step 40 \
+    --batch_size 24 \
+    --num_workers 4 \
+    --gpus 0,1,2,3 \
     --num_classes 1 \
     --input_h 608 \
     --input_w 1088 \
     --num_head_conv 1 \
     --pre_hm \
     --use_bfl \
+    --wh \
     --hungarian \
     --custom_dataset_img_path /path/to/bee/train \
     --custom_dataset_ann_path /path/to/bee/annotations/train.json \
@@ -244,18 +249,19 @@ python train.py \
     --arch dla34 \
     --dataset mot \
     --num_epochs 70 \
-    --lr 5e-4 \
+    --lr 1.25e-4 \
     --lr_step 60 \
-    --batch_size 8 \
-    --num_workers 8 \
+    --batch_size 16 \
+    --num_workers 4 \
     --gpus 0,1 \
     --num_classes 1 \
     --input_h 608 \
     --input_w 1088 \
     --num_head_conv 1 \
+    --K 256 \
     --pre_hm \
-    --wh \
     --use_bfl \
+    --wh \
     --hungarian \
     --custom_dataset_img_path /path/to/MOT17/train \
     --custom_dataset_ann_path /path/to/MOT17/annotations/train.json \
@@ -275,19 +281,20 @@ python train.py \
     --exp_id dance \
     --arch dla34 \
     --dataset mot \
-    --num_epochs 70 \
-    --lr 5e-4 \
-    --lr_step 60 \
-    --batch_size 8 \
-    --num_workers 8 \
-    --gpus 0,1 \
+    --num_epochs 90 \
+    --lr 1.3e-4 \
+    --lr_step 50 \
+    --batch_size 16 \
+    --num_workers 4 \
+    --gpus 0,1,2,3 \
     --num_classes 1 \
     --input_h 608 \
     --input_w 1088 \
     --num_head_conv 1 \
+    --K 100 \
     --pre_hm \
-    --wh \
     --use_bfl \
+    --wh \
     --hungarian \
     --custom_dataset_img_path /path/to/dancetrack/train \
     --custom_dataset_ann_path /path/to/dancetrack/annotations/train.json \
@@ -305,35 +312,37 @@ bash train_sports.sh
 ```bash
 python train.py \
     --exp_id sports \
-    --arch dla34 \
+    --arch dla60 \
     --dataset mot \
-    --num_epochs 70 \
-    --lr 5e-4 \
-    --lr_step 60 \
-    --batch_size 8 \
-    --num_workers 8 \
-    --gpus 0,1 \
+    --num_epochs 80 \
+    --lr 1.2e-4 \
+    --lr_step 45 \
+    --batch_size 20 \
+    --num_workers 4 \
+    --gpus 0,1,2,3 \
     --num_classes 1 \
     --input_h 608 \
     --input_w 1088 \
     --num_head_conv 1 \
+    --K 100 \
     --pre_hm \
-    --wh \
     --use_bfl \
+    --wh \
     --hungarian \
     --custom_dataset_img_path /path/to/sportsmot/train \
     --custom_dataset_ann_path /path/to/sportsmot/annotations/train.json \
-    --load_model pretrain/dla34-ba72cf86.pth
+    --load_model pretrain/dla60-24839fc4.pth
 ```
 
 ### Key Parameters
 
-- `--arch dla34`: Backbone architecture (dla34, dla169, resnet50)
-- `--use_bfl`: Enable Gate Attention Decoder
-- `--wh`: Use width-height head for bbox prediction
+- `--arch dla34|dla60`: Backbone architecture (dla34 for MOT17/BEE24/DanceTrack, dla60 for SportsMOT)
+- `--use_bfl`: Enable Q-Gated Linear Attention Decoder (required for all datasets)
+- `--wh`: Use auxiliary width-height head for bbox supervision (required for all datasets)
 - `--pre_hm`: Use previous heatmap for tracking
 - `--hungarian`: Use Hungarian algorithm for data association
 - `--num_head_conv 1`: Number of convolutional layers in detection heads
+- `--K`: Maximum number of detections per frame (256 for MOT17, 200 for BEE24, 100 for DanceTrack/SportsMOT)
 
 ### Monitor Training
 
@@ -341,11 +350,11 @@ python train.py \
 tensorboard --logdir=exp/tracking.ctdet/mot17/logs
 ```
 
----
+
 
 ## Tracking
 
-### MOT17 Validation
+### MOT17
 
 **Run tracking:**
 ```bash
@@ -365,8 +374,8 @@ python test.py \
     --K 256 \
     --num_head_conv 1 \
     --pre_hm \
-    --wh \
     --use_bfl \
+    --wh \
     --track_thresh 0.4 \
     --pre_thresh 0.5 \
     --new_thresh 0.4 \
@@ -409,7 +418,7 @@ bash test_dance.sh
 bash test_sports.sh
 ```
 
----
+
 
 ## Demo
 
@@ -444,15 +453,16 @@ font_thickness = 3  # ID label font thickness
 ```bash
 python demo.py \
     --demo /path/to/video.mp4 \
-    --load_model exp/tracking.ctdet/mot17_half_wh_bfl/model_60.pth \
+    --load_model exp/tracking.ctdet/mot17/model_60.pth \
     --arch dla34 \
     --use_bfl \
+    --wh \
     --track_thresh 0.4 \
     --debug 1 \
     --save_video
 ```
 
----
+
 
 ## Citation
 
@@ -465,7 +475,7 @@ python demo.py \
 }
 ```
 
----
+
 
 ## Acknowledgements
 
@@ -476,7 +486,7 @@ This work is built upon the following excellent projects:
 - [ByteTrack](https://github.com/ifzhang/ByteTrack)
 - [DLA](https://github.com/ucbdrive/dla)
 
----
+
 
 ## License
 
